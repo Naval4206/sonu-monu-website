@@ -5,33 +5,21 @@ products_bp = Blueprint("products", __name__)
 
 @products_bp.route("/products", methods=["GET"])
 def get_products():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT 
-                id,
-                name,
-                brand,
-                gender,
-                size,
-                age_group,
-                image_path,
-                created_at
-            FROM products
-            ORDER BY created_at DESC
-        """)
+    cursor.execute("""
+        SELECT id, name, brand, gender, size, image_path
+        FROM products
+        ORDER BY id DESC
+    """)
 
-        products = cursor.fetchall()
+    products = cursor.fetchall()
 
-        cursor.close()
-        conn.close()
+    for p in products:
+        p["image_url"] = f"/uploads/{p['image_path']}"
 
-        return jsonify(products), 200
+    cursor.close()
+    conn.close()
 
-    except Exception as e:
-        return jsonify({
-            "error": "Failed to fetch products",
-            "details": str(e)
-        }), 500
+    return jsonify(products)
