@@ -80,10 +80,17 @@ export default function ProductsPage() {
                 <td className="p-4">{p.brand}</td>
                 <td className="p-4">{p.gender}</td>
                 <td className="p-4">{p.size}</td>
-                <td className="p-4">
+                <td className="p-4 flex gap-2">
+                  <Link
+                    href={`/admin/products/edit/${p.id}`}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                  >
+                    Edit
+                  </Link>
+
                   <button
                     onClick={() => deleteProduct(p.id)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                    className="bg-red-600 text-white px-3 py-1 rounded"
                   >
                     Delete
                   </button>

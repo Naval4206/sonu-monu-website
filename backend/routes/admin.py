@@ -130,15 +130,29 @@ def update_product(product_id):
     brand = data.get("brand")
     gender = data.get("gender")
     size = data.get("size")
+    image = request.files.get("image")
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
+    
+    cursor.execute("SELECT image_url FROM products WHERE id=%s", (product_id,))
+    product = cursor.fetchone()
+
+    if not product:
+        return jsonify({"error": "Product not found"}), 404
+
+    image_url = product["image_url"]
+
+    if image:
+        filename = secure_filename(image.filename)
+        image_url = f"{int(time.time())}_{filename}"
+        image.save(os.path.join("uploads/products", image_url))
 
     cursor.execute("""
         UPDATE products
-        SET name=%s, brand=%s, gender=%s, size=%s
+        SET name=%s, brand=%s, gender=%s, size=%s, image_url=%s
         WHERE id=%s
-    """, (name, brand, gender, size, product_id))
+    """, (name, brand, gender, size, image_url, product_id))
 
     conn.commit()
     cursor.close()
@@ -157,7 +171,7 @@ def get_store_feedback():
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT id, rating, feedback, created_at
+        SELECT id, name, phone, email, rating, feedback, is_read, created_at
         FROM store_feedback
         ORDER BY created_at DESC
     """)
@@ -167,6 +181,37 @@ def get_store_feedback():
     conn.close()
 
     return jsonify(feedbacks), 200
+
+# =========================
+# STORE FEEDBACK READ
+# =========================
+@admin_bp.route("/admin/feedback/store/read/<int:id>", methods=["PUT"])
+@jwt_required()
+@admin_required
+def mark_store_read(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE store_feedback SET is_read=1 WHERE id=%s", (id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"message": "Marked as read"}, 200
+
+# =========================
+# STORE FEEDBACK DELETE
+# =========================
+@admin_bp.route("/admin/feedback/store/<int:id>", methods=["DELETE"])
+@jwt_required()
+@admin_required
+def delete_store_feedback(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM store_feedback WHERE id=%s", (id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"message": "Deleted"}, 200
+
 
 # =========================
 # PRODUCT FEEDBACK
@@ -179,7 +224,7 @@ def get_product_feedback():
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT id, product_name, feedback, created_at
+        SELECT id, product_name, name, phone, email, feedback, is_read, created_at
         FROM product_feedback
         ORDER BY created_at DESC
     """)
@@ -191,6 +236,36 @@ def get_product_feedback():
     return jsonify(feedbacks), 200
 
 # =========================
+# PRODUCT FEEDBACK READ
+# =========================
+@admin_bp.route("/admin/feedback/product/read/<int:id>", methods=["PUT"])
+@jwt_required()
+@admin_required
+def mark_product_read(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE product_feedback SET is_read=1 WHERE id=%s", (id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"message": "Marked as read"}, 200
+
+# =========================
+# PRODUCT FEEDBACK DELETE
+# =========================
+@admin_bp.route("/admin/feedback/product/<int:id>", methods=["DELETE"])
+@jwt_required()
+@admin_required
+def delete_product_feedback(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM product_feedback WHERE id=%s", (id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"message": "Deleted"}, 200
+
+# =========================
 #  USER QUERIES
 # =========================
 @admin_bp.route("/admin/queries", methods=["GET"])
@@ -200,15 +275,56 @@ def get_user_queries():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT id, name, phone, email, message, created_at
-        FROM queries
-        ORDER BY created_at DESC
-    """)
-    queries = cursor.fetchall()
+    cursor.execute("SELECT * FROM queries ORDER BY created_at DESC")
+    data = cursor.fetchall()
 
     cursor.close()
     conn.close()
 
-    return jsonify(queries), 200
+    return jsonify(data), 200
+
+# =========================
+#  USER QUERIES READ
+# =========================
+@admin_bp.route("/admin/queries/read/<int:id>", methods=["PUT"])
+@jwt_required()
+@admin_required
+def mark_query_read(id):
+    identity = get_jwt_identity()
+    if identity["role"] != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("UPDATE queries SET is_read = TRUE WHERE id=%s", (id,))
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return {"message": "Marked as read"}
+
+# =========================
+#  USER QUERIES DELETE
+# =========================
+@admin_bp.route("/admin/queries/<int:id>", methods=["DELETE"])
+@jwt_required()
+@admin_required
+def delete_query(id):
+    identity = get_jwt_identity()
+    if identity["role"] != "admin":
+        return {"error": "Unauthorized"}, 403
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM queries WHERE id=%s", (id,))
+    conn.commit()
+
+    cur.close()
+    conn.close()
+
+    return {"message": "Query deleted"}
+
 
