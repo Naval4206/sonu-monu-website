@@ -1,25 +1,49 @@
 from flask import Blueprint, jsonify
 from db import get_db_connection
 
-products_bp = Blueprint("products", __name__)
+products_bp = Blueprint("products_bp", __name__)
 
 @products_bp.route("/products", methods=["GET"])
 def get_products():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT id, name, brand, gender, size, image_path
-        FROM products
-        ORDER BY id DESC
-    """)
+        cursor.execute("""
+            SELECT 
+                id,
+                name,
+                brand,
+                gender,
+                size,
+                price,
+                image_path
+            FROM products
+            ORDER BY id DESC
+        """)
 
-    products = cursor.fetchall()
+        products = cursor.fetchall()
 
-    for p in products:
-        p["image_url"] = f"/uploads/{p['image_path']}"
+        # Build image_url safely
+        for product in products:
+            if product.get("image_path"):
+                product["image_url"] = f"/uploads/products/{product['image_path']}"
+            else:
+                product["image_url"] = None
 
-    cursor.close()
-    conn.close()
+        cursor.close()
+        conn.close()
 
-    return jsonify(products)
+        # ✅ ALWAYS JSON
+        return jsonify({
+            "success": True,
+            "data": products
+        }), 200
+
+    except Exception as e:
+        # 🔒 NEVER return HTML on error
+        return jsonify({
+            "success": False,
+            "message": "Failed to fetch products",
+            "error": str(e)
+        }), 500

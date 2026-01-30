@@ -1,15 +1,29 @@
-# Python
+# --------------------
+# Node / Next.js
+# --------------------
+node_modules/
+.next/
+out/
+.env.local
+.env
+
+# --------------------
+# Python / Flask
+# --------------------
 __pycache__/
 *.pyc
 .env
+venv/
 
-# Node
-node_modules/
-.next/
+# --------------------
+# Uploads (keep empty folder if needed)
+# --------------------
+uploads/products/*
+!uploads/products/.gitkeep
 
-# Uploads (optional – keep if images are large)
-backend/uploads/
-
-# OS
+# --------------------
+# OS / Editor
+# --------------------
 .DS_Store
-Thumbs.db
+.vscode/
+.idea/

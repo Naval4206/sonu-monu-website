@@ -10,6 +10,7 @@ export default function AddProductPage() {
   const [brand, setBrand] = useState("");
   const [gender, setGender] = useState("");
   const [size, setSize] = useState("");
+  const [price, setPrice] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -32,12 +33,13 @@ export default function AddProductPage() {
     formData.append("brand", brand);
     formData.append("gender", gender);
     formData.append("size", size);
+    formData.append("price", price);
     formData.append("image", image);
 
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/admin/products", {
+      const res = await fetch("http://127.0.0.1:8000/admin/products", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -64,6 +66,7 @@ export default function AddProductPage() {
       <h1 className="text-2xl font-bold mb-6">➕ Add Product</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Name */}
         <input
           type="text"
           placeholder="Product Name"
@@ -73,6 +76,7 @@ export default function AddProductPage() {
           required
         />
 
+        {/* Brand */}
         <input
           type="text"
           placeholder="Brand"
@@ -81,6 +85,7 @@ export default function AddProductPage() {
           onChange={(e) => setBrand(e.target.value)}
         />
 
+        {/* Gender */}
         <select
           className="w-full border p-2 rounded"
           value={gender}
@@ -93,14 +98,33 @@ export default function AddProductPage() {
           <option value="Unisex">Unisex</option>
         </select>
 
-        <input
-          type="text"
-          placeholder="Size (S, M, L, XL)"
+        {/* Size */}
+        <select
           className="w-full border p-2 rounded"
           value={size}
           onChange={(e) => setSize(e.target.value)}
+          required
+        >
+          <option value="">Select Size</option>
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+
+        {/* ✅ Price FIXED */}
+        <input
+          type="number"
+          placeholder="Enter price (₹)"
+          className="w-full border p-2 rounded"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          required
         />
 
+        {/* Image */}
         <input
           type="file"
           accept="image/*"
@@ -109,6 +133,7 @@ export default function AddProductPage() {
           required
         />
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={loading}

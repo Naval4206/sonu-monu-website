@@ -13,7 +13,7 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/auth/login", {
+      const res = await fetch("http://127.0.0.1:8000/auth/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, password }),

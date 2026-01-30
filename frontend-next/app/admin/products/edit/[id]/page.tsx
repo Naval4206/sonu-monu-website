@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
-  const id = params.id;
+  const id = params.id as string;
 
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
@@ -14,34 +14,44 @@ export default function EditProductPage() {
     brand: "",
     gender: "",
     size: "",
+    price: "",
     image: null as File | null,
   });
 
   // 🔹 Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
-      const token = localStorage.getItem("admin_token");
+      try {
+        const token = localStorage.getItem("admin_token");
 
-      const res = await fetch("http://127.0.0.1:5000/admin/products", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      const product = data.find((p: any) => p.id == id);
-
-      if (product) {
-        setForm({
-          name: product.name || "",
-          brand: product.brand || "",
-          gender: product.gender || "",
-          size: product.size || "",
-          image: null,
+        const res = await fetch("http://127.0.0.1:8000/admin/products", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-      }
 
-      setLoading(false);
+        const json = await res.json();
+
+        // ✅ IMPORTANT FIX
+        if (json.success && Array.isArray(json.data)) {
+          const product = json.data.find((p: any) => p.id == id);
+
+          if (product) {
+            setForm({
+              name: product.name ?? "",
+              brand: product.brand ?? "",
+              gender: product.gender ?? "",
+              size: product.size ?? "",
+              price: String(product.price ?? ""),
+              image: null,
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch product", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProduct();
@@ -58,12 +68,13 @@ export default function EditProductPage() {
     formData.append("brand", form.brand);
     formData.append("gender", form.gender);
     formData.append("size", form.size);
+    formData.append("price", form.price);
 
     if (form.image) {
       formData.append("image", form.image);
     }
 
-    await fetch(`http://127.0.0.1:5000/admin/products/${id}`, {
+    await fetch(`http://127.0.0.1:8000/admin/products/${id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -74,7 +85,7 @@ export default function EditProductPage() {
     router.push("/admin/products");
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="p-6">Loading...</p>;
 
   return (
     <div className="max-w-xl bg-white p-6 shadow rounded-lg">
@@ -101,7 +112,7 @@ export default function EditProductPage() {
           required
         />
 
-        {/* ✅ Gender Select */}
+        {/* Gender */}
         <select
           value={form.gender}
           onChange={(e) => setForm({ ...form, gender: e.target.value })}
@@ -116,12 +127,29 @@ export default function EditProductPage() {
         </select>
 
         {/* Size */}
-        <input
-          type="text"
-          placeholder="Size (S, M, L, XL)"
+        <select
           value={form.size}
           onChange={(e) => setForm({ ...form, size: e.target.value })}
           className="w-full border p-2 rounded"
+          required
+        >
+          <option value="">Select Size</option>
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
+
+        {/* ✅ Price FIXED */}
+        <input
+          type="number"
+          placeholder="Price (₹)"
+          value={form.price}
+          onChange={(e) => setForm({ ...form, price: e.target.value })}
+          className="w-full border p-2 rounded"
+          required
         />
 
         {/* Image */}
@@ -134,13 +162,23 @@ export default function EditProductPage() {
           className="w-full"
         />
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Update Product
-        </button>
+        {/* Action Buttons */}
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Update Product
+          </button>
+
+          <button
+            type="button"
+            onClick={() => router.push("/admin/products")}
+            className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

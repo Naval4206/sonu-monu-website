@@ -1,45 +1,51 @@
 export default function WhyChooseUs() {
   return (
-    <section className="py-32 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="w-full bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-20">
 
-        {/* Heading */}
-        <div className="text-center mb-24">
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
-            Why Customers Choose <span className="text-blue-700">Sonu Monu</span>
+        <div className="text-center mb-14">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+            Why Choose Sonu Monu
           </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            We focus on what truly matters — quality, comfort, and value.
+          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+            Trusted by local customers for quality products and honest service.
           </p>
         </div>
 
-        {/* Feature Blocks */}
-        <div className="grid md:grid-cols-3 gap-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
-          <div className="group relative p-10 rounded-3xl bg-blue-50 hover:bg-blue-700 transition">
-            <h3 className="text-xl font-bold text-blue-700 group-hover:text-white mb-4">
-              Premium Quality
+          {/* Card 1 */}
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-4xl mb-4">👕</div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Quality Clothing
             </h3>
-            <p className="text-gray-600 group-hover:text-blue-100">
-              Carefully selected fabrics and superior craftsmanship.
+            <p className="mt-3 text-gray-600">
+              We carefully select fabrics that are comfortable, durable, and
+              suitable for daily wear.
             </p>
           </div>
 
-          <div className="group relative p-10 rounded-3xl bg-blue-50 hover:bg-blue-700 transition">
-            <h3 className="text-xl font-bold text-blue-700 group-hover:text-white mb-4">
-              Fashion for All Ages
+          {/* Card 2 */}
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-4xl mb-4">💰</div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Affordable Prices
             </h3>
-            <p className="text-gray-600 group-hover:text-blue-100">
-              Clothing designed for kids, teens, and adults.
+            <p className="mt-3 text-gray-600">
+              Stylish fashion at fair prices so everyone can shop confidently.
             </p>
           </div>
 
-          <div className="group relative p-10 rounded-3xl bg-blue-50 hover:bg-blue-700 transition">
-            <h3 className="text-xl font-bold text-blue-700 group-hover:text-white mb-4">
-              Affordable Pricing
+          {/* Card 3 */}
+          <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-md transition">
+            <div className="text-4xl mb-4">🤝</div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Trusted Local Store
             </h3>
-            <p className="text-gray-600 group-hover:text-blue-100">
-              Premium fashion without premium prices.
+            <p className="mt-3 text-gray-600">
+              A well-known store in Dhanbad serving customers with honesty and
+              care.
             </p>
           </div>
 

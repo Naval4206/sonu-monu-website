@@ -7,74 +7,126 @@ type Product = {
   id: number;
   name: string;
   brand: string;
-  image_url: string;
+  gender: string;
+  size: string;
+  price: number;
+  image_url: string | null;
 };
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data.slice(0, 4)))
-      .catch((err) => console.error(err));
+    const fetchFeaturedProducts = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/products`
+        );
+        const json = await res.json();
+
+        if (json.success && Array.isArray(json.data)) {
+          // show latest 4 products
+          setProducts(json.data.slice(0, 4));
+        }
+      } catch (error) {
+        console.error("Failed to load featured products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
   }, []);
 
   return (
-    <section className="py-32 bg-blue-50">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="w-full bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-24">
 
-        {/* Heading */}
-        <div className="text-center mb-20">
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
-            Featured <span className="text-blue-700">Products</span>
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <span className="inline-block mb-4 bg-blue-100 text-blue-600 px-4 py-1 rounded-full text-sm font-medium">
+            Featured Collection
+          </span>
+
+          <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900">
+            Trending Products
           </h2>
-          <p className="text-gray-600 text-lg">
-            Handpicked styles our customers love
+
+          <p className="mt-5 text-gray-600 max-w-2xl mx-auto text-base md:text-lg">
+            Discover some of our most loved styles, carefully selected
+            for quality, comfort, and everyday fashion.
           </p>
         </div>
 
+        {/* Loading */}
+        {loading && (
+          <p className="text-center text-gray-500">
+            Loading featured products...
+          </p>
+        )}
+
+        {/* Empty */}
+        {!loading && products.length === 0 && (
+          <p className="text-center text-gray-500">
+            No products available
+          </p>
+        )}
+
         {/* Products Grid */}
-        <div className="grid md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-3xl shadow-lg overflow-hidden hover:-translate-y-2"
+              className="group bg-gray-50 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300"
             >
-              <div className="h-56 bg-gray-100 flex items-center justify-center">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
+              {/* Image */}
+              <div className="relative h-64 bg-gray-100 overflow-hidden">
+                <div className="absolute top-4 left-4 bg-blue-600 text-white text-xs px-3 py-1 rounded-full z-10">
+                  New
+                </div>
+
+                {product.image_url ? (
+                  <img
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${product.image_url}`}
+                    alt={product.name}
+                    className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-100
+                    flex items-center justify-center text-gray-400 text-sm">
+                    No Image
+                  </div>
+                )}
               </div>
 
+              {/* Content */}
               <div className="p-6">
-                <h3 className="font-bold text-lg text-gray-900 mb-1">
-                  {product.name}
-                </h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  {product.brand}
+                <p className="text-sm text-gray-500 mb-1">
+                  {product.gender} • {product.size}
                 </p>
 
-                <Link
-                  href="/products"
-                  className="text-blue-700 font-semibold hover:underline"
-                >
-                  View Details →
-                </Link>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {product.name}
+                </h3>
+
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="text-blue-600 font-bold text-lg">
+                    ₹{product.price}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* CTA */}
-        <div className="text-center mt-20">
+        {/* View More */}
+        <div className="mt-16 text-center">
           <Link
             href="/products"
-            className="inline-block px-10 py-4 rounded-xl bg-blue-700 text-white text-lg font-semibold hover:bg-blue-800 shadow-lg"
+            className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl text-base md:text-lg font-medium hover:bg-blue-700 transition"
           >
-            View All Products
+            View All Products →
           </Link>
         </div>
 
