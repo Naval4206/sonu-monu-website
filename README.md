@@ -112,11 +112,11 @@ NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
 
 
 ### Backend (`backend/.env`)
-JWT_SECRET_KEY=your_secret_key
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=sonu_monu
+- JWT_SECRET_KEY=your_secret_key
+- DB_HOST=localhost
+- DB_USER=root
+- DB_PASSWORD=your_password
+- DB_NAME=sonu_monu
 
 
 ---
