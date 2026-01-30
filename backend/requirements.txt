@@ -4,3 +4,4 @@ Flask-JWT-Extended
 mysql-connector-python
 Werkzeug
 gunicorn
+bcrypt>=4.1.2
