@@ -40,7 +40,7 @@ def create_app():
 
     @app.route("/")
     def home():
-        return jsonify({"status": "Backend running successfully"})
+        return "Backend is live"
 
     return app
 
