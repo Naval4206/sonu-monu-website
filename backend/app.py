@@ -36,11 +36,7 @@ def create_app():
     # ================== HEALTH / HOME ==================
     @app.route("/")
     def home():
-        return {"status": "Backend is live"}
-
-    @app.route("/health")
-    def health():
-        return {"status": "ok"}
+        return jsonify({"status": "Backend running successfully"})
 
     return app
 
